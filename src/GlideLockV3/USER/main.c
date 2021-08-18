@@ -19,6 +19,7 @@ void InitTestPin(void);
 void printLogo(void);
 void updateState(void);
 void initState(void);
+void setLED(void);
 
 u16 tick[4]={0,0,0,0};
 u16 cpucnt;
@@ -43,7 +44,7 @@ s8 dir;
 s8 position;
 
 const s32* pwm_rate;
-const s32* roll_step_val;
+const float* roll_step_val;
 
 int main(void)
 {	
@@ -51,9 +52,10 @@ int main(void)
 	
 	u8 ledr=1,ledg=1,ledb=0;
 	
-	u8 key;
+	s32 key;
+	s32 keyt;
 	
-	u16 t;
+	u16 t;	
 	
 	//Init drivers
 	delay_init();
@@ -112,6 +114,8 @@ int main(void)
 	ledg=0;
 	ledb=1;	
 	LEDSetRGB(ledr,ledg,ledb);
+	setLED();
+
 	while(1)
 	{	
 		//main work
@@ -187,10 +191,59 @@ int main(void)
 //			//printf("%d,%d,%d,%d,%d,%d\r\n",pwmValues[0],pwmValues[1],pwmValues[2],pwmValues[3],pwmValues[4],pwmValues[5]);
 		}				
 		//LED
-		if(tick[0]>ledInterval)
-		{			
-			LEDFlip();
+//		if(tick[0]>ledInterval)
+//		{			
+//			LEDFlip();
+//			tick[0]=0;
+//		}
+		if(tick[0]>1000)
+		{						
 			tick[0]=0;
+			LEDUpdate();
+			key|=KeyRead();
+			keyt=key&0x7FF;
+//			if(keyt==6||keyt==14||keyt==0x1E||keyt==0x3E)
+//			{
+//				GLState.mode^=1;
+////				if(GLState.mode)
+////				{
+////					ledr=0;
+////					ledg=1;
+////					ledb=1;					
+////				}
+////				else
+////				{
+////					ledr=1;
+////					ledg=0;
+////					ledb=1;		
+////				}
+////				LEDSetRGB(ledr,ledg,ledb);
+////				LEDFlash(3);
+//				setLED();
+//			}
+			if(!(key&0x01))
+			{
+				keyt=~(key>>1);
+				keyt=keyt&(-keyt);
+				if(keyt>=(1<<2)&&keyt<=(1<<7))
+				{
+					GLState.mode^=1;
+					setLED();
+				}
+				if(keyt>=(1<<8)&&keyt<=(1<<24))			
+				{
+					sysState.strokeType++;
+					if(sysState.strokeType>=3)
+						sysState.strokeType=0;
+					setLED();
+				}				
+			}
+			else if(key==0x7FFFFFFF)
+			{
+				StrokeSetDefType();
+				LEDFlash(3);
+			}
+			key<<=1;
 		}
 		if(tick[1]>5000)
 		{						
@@ -200,31 +253,15 @@ int main(void)
 				AnalyzePkg();
 				USART_RX_STA=0;
 			}
-			key|=KeyRead();
-			if((key&0x7)==3)
-			{
-				GLState.mode^=1;
-				if(GLState.mode)
-				{
-					ledr=0;
-					ledg=1;
-					ledb=1;					
-				}
-				else
-				{
-					ledr=1;
-					ledg=0;
-					ledb=1;		
-				}
-				LEDSetRGB(ledr,ledg,ledb);
-				LEDFlash(3);				
-			}
-			key<<=1;
+			
+			
 //			printf("%d %f\r\n",GLState.peroid[0],10000.0/GLState.peroid[0]);
 //			for(i=0;i<8;i++)
 //				printf("%d,",pwmValues[i]);
 //			printf("\r\n");
+
 //			printf("%d\r\n",t);
+
 
 		}		
 	}
@@ -299,7 +336,7 @@ void updateState(void)
 	if(pwmValues[CH_ROLL_STR]<1300)
 		GLState.rollValue=*roll_step_val;
 	else if(pwmValues[CH_ROLL_STR]<1600)
-		GLState.rollValue=(*roll_step_val)<<1;
+		GLState.rollValue=(*roll_step_val)*2;
 	else
 		GLState.rollValue=(*roll_step_val)*3;
 	
@@ -353,6 +390,25 @@ void TIM3_IRQHandler(void)
 		GLState.counter++;
 		GLState.freqCounter++;
 	}
+}
+
+void setLED(void)
+{
+	u32 ledp;
+	if(GLState.mode)
+	{
+		ledp=LED_1Hz;
+	}
+	else
+	{
+		ledp=LED_ON;
+	}
+	if(sysState.strokeType==NORMAL)
+		LEDSetPattern(ledp,LED_OFF,LED_OFF);
+	if(sysState.strokeType==CONST_UPTIME)
+		LEDSetPattern(LED_OFF,ledp,LED_OFF);
+	if(sysState.strokeType==CONST_RATIO)
+		LEDSetPattern(LED_OFF,LED_OFF,ledp);	
 }
 
 void InitTestPin(void)

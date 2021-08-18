@@ -622,6 +622,16 @@
               <FileType>5</FileType>
               <FilePath>.\stroke.h</FilePath>
             </File>
+            <File>
+              <FileName>mathHelper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\MODULE\mathHelper.h</FilePath>
+            </File>
+            <File>
+              <FileName>mathHelper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULE\mathHelper.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

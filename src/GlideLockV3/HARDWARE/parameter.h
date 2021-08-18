@@ -15,7 +15,7 @@
 #define PARAM_TYPE_FLOAT 1
 #define PARAM_TYPE_BINARY 2
 
-#define PARAM_NUM 15
+#define PARAM_NUM 24
 
 typedef union
 {
@@ -55,6 +55,6 @@ void ParamReset(void);
 u8 ParamSet(u8 id,s32 v);
 void ParamShow(void);
 void* ParamGetFromName(const char* name);
-u8 ParamSetWithName(u8* name,void* value);
+u8 ParamSetWithName(const char* name,void* value);
 
 #endif

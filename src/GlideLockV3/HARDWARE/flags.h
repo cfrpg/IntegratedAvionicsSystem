@@ -14,6 +14,8 @@
 #define NORMAL 0
 #define CONST_UPTIME 1
 #define CONST_RATIO 2
+#define DUAL_EXPO 1
+#define FOUR_POINTS 2
 
 typedef struct
 {

@@ -8,6 +8,7 @@ PPMState ppmState;
 const s32* input_rev;
 
 s32 pwmValues[8];
+float pwmNorm[8];
 PWMParams pwmParams;
 u8 pwmin_rev[8];
 
@@ -25,6 +26,7 @@ void PWMInInit(void)
 	for(i=0;i<8;i++)
 	{
 		pwmValues[i]=0;
+		pwmNorm[i]=0;
 		pwmin_rev[i]=t&1;
 		t>>=1;
 			
@@ -232,6 +234,14 @@ void TIM1IntPWM(void)
 					{
 						pwmValues[i]=pwmState[i].value;
 					}
+					if(i==CH_THRO)
+					{
+						pwmNorm[i]=((float)(pwmValues[i]-1000))/1000;
+					}
+					else
+					{
+						pwmNorm[i]=((float)(pwmValues[i]-1500))/500;
+					}
 					pwmState[i].STA=0;
 					setPolarity(i,TIM_ICPolarity_Rising);
 				}
@@ -347,6 +357,14 @@ void TIM4_IRQHandler(void)
 					{
 						pwmValues[i]=pwmState[i].value;
 					}
+					if(i==CH_THRO)
+					{
+						pwmNorm[i]=((float)(pwmValues[i]-1000))/1000;
+					}
+					else
+					{
+						pwmNorm[i]=((float)(pwmValues[i]-1500))/500;
+					}
 					pwmState[i].STA=0;
 					setPolarity(i,TIM_ICPolarity_Rising);
 				}
@@ -357,6 +375,6 @@ void TIM4_IRQHandler(void)
 					setPolarity(i,TIM_ICPolarity_Falling);
 				}
 			}
-		}		
+		}
 	}	
 }

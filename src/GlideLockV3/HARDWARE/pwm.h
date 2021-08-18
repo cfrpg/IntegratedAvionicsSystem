@@ -2,19 +2,19 @@
 #define __PWM_H
 #include "sys.h"
 
-#define CH_THRO 0
-#define CH_LAILE 1
-#define CH_RAILE 2
-#define CH_GLOCK 3
-#define CH_ROLLTEST 4
-#define CH_ROLL_STR 5
-#define CH_STROKE_MODE 6
-#define CH_ELEV 7
+#define CH_LAILE 0
+#define CH_RAILE 1
+#define CH_ELEV 2
+#define CH_THRO 3
+#define CH_GLOCK 4
+#define CH_ROLLTEST 5
+#define CH_ROLL_STR 6
+#define CH_STROKE_MODE 7
 
-#define OUT_THRO 0
-#define OUT_LAILE 1
-#define OUT_RAILE 2
-#define OUT_ELEV 3
+#define OUT_LAILE 0
+#define OUT_RAILE 1
+#define OUT_ELEV 2
+#define OUT_THRO 3
 
 typedef struct
 {
@@ -47,6 +47,7 @@ typedef struct
 //extern TIMCCState pwmState[6];
 extern s32 pwmValues[8];
 extern PWMParams pwmParams;
+extern float pwmNorm[8];
 
 void PWMInit(u32 freq);
 void PWMInInit(void);

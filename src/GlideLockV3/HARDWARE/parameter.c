@@ -167,7 +167,46 @@ void* ParamGetFromName(const char* name)
 	return 0;
 }
 
-u8 ParamSetWithName(u8* name,void* value)
+u8 ParamSetWithName(const char* name,void* value)
 {
-	return 0;
+	u8 flag=0;
+	u8 i=0;	
+	for(i=0;i<PARAM_NUM;i++)
+	{
+		if(strcmp(name,parameterList[i].name)==0)
+		{
+			flag=1;			
+			break;
+		}
+	}
+	if(flag)
+	{
+		if(parameterList[i].type<=0)
+		{
+			params.values[i].intValue=*((s32*)value);
+			if(params.values[i].intValue>parameterList[i].maxValue.intValue)
+			{
+				params.values[i].intValue=parameterList[i].maxValue.intValue;
+			}
+			if(params.values[i].intValue<parameterList[i].minValue.intValue)
+			{
+				params.values[i].intValue=parameterList[i].minValue.intValue;
+			}
+				
+		}
+		if(parameterList[i].type>0)
+		{
+			params.values[i].floatValue=*((float*)value);
+			if(params.values[i].floatValue>parameterList[i].maxValue.floatValue)
+			{
+				params.values[i].floatValue=parameterList[i].maxValue.floatValue;
+			}
+			if(params.values[i].floatValue<parameterList[i].minValue.floatValue)
+			{
+				params.values[i].floatValue=parameterList[i].minValue.floatValue;
+			}
+		}
+		
+	}
+	return ParamWrite();
 }

@@ -4,9 +4,10 @@
 #include "sys.h"
 #include "flags.h"
 
-extern u16 strokeThro;
+extern float strokeThro;
 
 void StrokeInit(void);
 void StrokeUpdate(void);
+void StrokeSetDefType(void);
 
 #endif
