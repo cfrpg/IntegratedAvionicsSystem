@@ -182,8 +182,7 @@ void updateRollTest(void)
 		//arbitrary
 		//stuck
 		GLState.output[GL_LAILE]=LAileZero;
-		GLState.output[GL_RAILE]=RAileZero;
-		
+		GLState.output[GL_RAILE]=RAileZero;		
 	}
 }
 
@@ -207,6 +206,8 @@ void GLUpdate(s8 glEnabled,s8 rollEnabled)
 	}
 	GLState.GLEnabled=glEnabled;
 	
+	GLState.output[GL_LAILE]=pwmNorm[CH_LAILE];
+	GLState.output[GL_RAILE]=pwmNorm[CH_RAILE];
 	if(rollEnabled==ACTIVATED)
 	{
 		if(!GLState.rollEnabled)
@@ -247,7 +248,7 @@ void GLUpdate(s8 glEnabled,s8 rollEnabled)
 			GLState.phase=0;
 		}
 	}
-		
+	
 	GLState.hallState[0]=0;
 	GLState.hallState[1]=0;
 	GLState.hallState[2]=0;

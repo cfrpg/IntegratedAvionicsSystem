@@ -135,7 +135,7 @@ int main(void)
 			tick[2]=0;
 			updateState();
 			
-			if(sysState.isarmed==ARMED)			
+			if(sysState.isarmed==ARMED)
 			{
 				GLUpdate(sysState.glideLock,sysState.rollTest);
 				StrokeUpdate();
@@ -344,12 +344,13 @@ void initState(void)
 void updateState(void)
 {
 	//Select roll strength
+	GLState.rollValue=*roll_step_val*2;
 	if(pwmValues[CH_ROLL_STR]<1300)
-		GLState.rollValue=*roll_step_val;
+		GLState.rollValue=*roll_step_val*2;
 	else if(pwmValues[CH_ROLL_STR]<1600)
-		GLState.rollValue=(*roll_step_val)*2;
+		GLState.rollValue=(*roll_step_val)*4;
 	else
-		GLState.rollValue=(*roll_step_val)*3;
+		GLState.rollValue=(*roll_step_val)*6;
 	
 	//Check glide lock	
 	if(pwmValues[CH_GLOCK]>1500)

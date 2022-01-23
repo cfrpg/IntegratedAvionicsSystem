@@ -8,7 +8,7 @@ const ParameterRecord parameterList[PARAM_NUM]=
 	5,	"THRO_HOMING",		{.floatValue=	0.35},	{.floatValue=	0},		{.floatValue=	1},
 	0,	"DEAD_ZONE",		{.intValue=		20},	{.intValue=		0},		{.intValue=		1000},
 	5,	"ROLL_DELAY",		{.floatValue=	0.5},	{.floatValue=	0},		{.floatValue=	2},
-	5,	"ROLL_STEP_VAL",	{.floatValue=	0.1},	{.floatValue=	0},		{.floatValue=	0.33},
+	5,	"ROLL_STEP_VAL",	{.floatValue=	0.1},	{.floatValue=	0},		{.floatValue=	0.3333},
 	5,	"ROLL_SPAN",		{.floatValue=	0.5},	{.floatValue=	0},		{.floatValue=	10},
 	5,	"THRO_SLOPE",		{.floatValue=	1.5},	{.floatValue=	0},		{.floatValue=	1000},
 	-1,	"INPUT_REV",		{.intValue=		0},		{.intValue=		0},		{.intValue=		1024},

@@ -17,7 +17,7 @@
 
 #define RollTestCh 1
 #define LAileZero 1.0
-#define RAileZero 0
+#define RAileZero -1.0
 
 typedef struct
 {	
