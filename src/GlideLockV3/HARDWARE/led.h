@@ -2,6 +2,17 @@
 #define __LED_H
 #include "sys.h"
 
+#ifdef IAS_V2_BOARD
+#define LED_R PAout(6)
+#define LED_G PAout(5)
+#define LED_B PAout(4)
+#else
+#define LED_R PBout(3)
+#define LED_G PBout(4)
+#define LED_B PBout(5)
+#endif
+
+
 #define LED_FLASH_T 100
 
 #define LED_1Hz 0x0F83E0

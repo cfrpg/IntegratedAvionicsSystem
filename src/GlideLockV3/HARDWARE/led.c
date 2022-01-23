@@ -1,6 +1,7 @@
 #include "led.h"
 #include "delay.h"
 
+
 u8 _led_state;
 u8 _led_r,_led_g,_led_b;
 u32 led_patterns[3];
@@ -10,15 +11,15 @@ void ledSetOut(void)
 {
 	if(_led_state)
 	{
-		PBout(3)=1;
-		PBout(4)=1;
-		PBout(5)=1;
+		LED_R=1;
+		LED_G=1;
+		LED_B=1;
 	}
 	else
 	{
-		PBout(3)=_led_r;
-		PBout(4)=_led_g;
-		PBout(5)=_led_b;
+		LED_R=_led_r;
+		LED_G=_led_g;
+		LED_B=_led_b;
 	}
 	
 }
@@ -26,13 +27,21 @@ void LEDInit(void)
 {
 	GPIO_InitTypeDef gi;
 
+#ifdef IAS_V2_BOARD
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);	
+	gi.GPIO_Pin=GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6;
+	gi.GPIO_Mode=GPIO_Mode_Out_PP;
+	gi.GPIO_Speed=GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA,&gi);
+#else
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);  
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
 	gi.GPIO_Pin=GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_3;
 	gi.GPIO_Mode=GPIO_Mode_Out_PP;
 	gi.GPIO_Speed=GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB,&gi);
+	GPIO_Init(GPIOB,&gi);	
+#endif
 
 	_led_state=0;
 	_led_r=1;
@@ -116,9 +125,9 @@ void LEDSetPattern(u32 r,u32 g,u32 b)
 
 void LEDUpdate()
 {
-	PBout(3)=led_backup[0]&0x00000001;
-	PBout(4)=led_backup[1]&0x00000001;
-	PBout(5)=led_backup[2]&0x00000001;
+	LED_R=led_backup[0]&0x00000001;
+	LED_G=led_backup[1]&0x00000001;
+	LED_B=led_backup[2]&0x00000001;
 	led_backup[0]>>=1;
 	led_backup[1]>>=1;
 	led_backup[2]>>=1;

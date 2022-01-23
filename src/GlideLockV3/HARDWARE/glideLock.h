@@ -26,9 +26,7 @@ typedef struct
 	s32 peroid[3];
 	float rollValue;
 	float throVal;
-//	u16 pwmBackup[4];	
 	float output[4];
-	//u16 throTgt;	
 	u8 mode;	
 	u8 hallState[4];
 	u8 GLEnabled;

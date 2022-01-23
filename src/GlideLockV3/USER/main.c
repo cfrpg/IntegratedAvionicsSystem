@@ -12,6 +12,8 @@
 #include "flags.h"
 #include "stroke.h"
 #include "mixer.h"
+#include "flash.h"
+#include "adc.h"
 
 void AnalyzePkg(void);
 void MainWork(void);
@@ -46,9 +48,14 @@ s8 position;
 const s32* pwm_rate;
 const float* roll_step_val;
 
+u8 buff[256];
+
+u32 cnt;
+
 int main(void)
 {	
-	u8 i;
+	u16 i,j;
+	u16 tmp[2];
 	
 	u8 ledr=1,ledg=1,ledb=0;
 	
@@ -73,7 +80,7 @@ int main(void)
 	{
 		ParamReset();
 		ParamWrite();
-		printf("Reset parameters.\r\n");		
+		printf("Reset parameters.\r\n");
 	}
 	
 	pwm_rate=ParamGetFromName("PWM_RATE");
@@ -110,11 +117,14 @@ int main(void)
 //		ledInterval=5000;
 //	else
 //		ledInterval=10000;
-	ledr=1;
-	ledg=0;
-	ledb=1;	
-	LEDSetRGB(ledr,ledg,ledb);
+//	ledr=1;
+//	ledg=0;
+//	ledb=1;	
+//	LEDSetRGB(ledr,ledg,ledb);
 	setLED();
+	
+	FlashInit();
+	ADCInit();
 
 	while(1)
 	{	
@@ -253,7 +263,8 @@ int main(void)
 				AnalyzePkg();
 				USART_RX_STA=0;
 			}
-			
+//			ADCReadFiltered(tmp);
+//			printf("%d %d\r\n",tmp[0],tmp[1]);
 			
 //			printf("%d %f\r\n",GLState.peroid[0],10000.0/GLState.peroid[0]);
 //			for(i=0;i<8;i++)
@@ -389,6 +400,7 @@ void TIM3_IRQHandler(void)
 		}
 		GLState.counter++;
 		GLState.freqCounter++;
+		cnt++;
 	}
 }
 

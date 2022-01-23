@@ -19,7 +19,6 @@ void GLInit(void)
 	thro_homing=ParamGetFromName("THRO_HOMING");
 	roll_delay=ParamGetFromName("ROLL_DELAY");
 	roll_span=ParamGetFromName("ROLL_SPAN");
-
 	
 	//Init Exti
 	GPIO_InitTypeDef gi;
@@ -60,11 +59,6 @@ void GLInit(void)
 	
 	glstate=2;
 	
-//	GLState.pwmBackup[0]=0;
-//	GLState.pwmBackup[1]=0;
-//	GLState.pwmBackup[2]=0;
-//	GLState.pwmBackup[3]=0;
-	
 	GLState.output[0]=0;
 	GLState.output[1]=0;
 	GLState.output[2]=0;
@@ -94,36 +88,29 @@ void updateGlideLock(void)
 	if(glstate==0)
 	{
 		GLState.working=0;
-		//printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaagl0\r\n");
 		if(pwmNorm[CH_THRO]<*thro_min)
 		{
 			glstate=1;
-			//GLState.hallState[0]=0;
 		}
 		else
 		{
-//			GLState.pwmBackup[0]=(u16)pwmValues[CH_THRO];
 			GLState.output[GL_THRO]=pwmNorm[CH_THRO];
 		}
 	}
 	if(glstate==1)
-	{		
-		//printf("aaaaaaaaaaaaaaaaaagl1\r\n");
+	{
 		GLState.working=1;
 		if(pwmNorm[CH_THRO]>=*thro_min)
 		{
 			glstate=0;
-//			GLState.pwmBackup[0]=(u16)pwmValues[CH_THRO];
 			GLState.output[GL_THRO]=pwmNorm[CH_THRO];
 		}
 		else if(GLState.hallState[2])
 		{
-			//GLState.hallState[0]=0;
 			glstate=2;
 		}
 		else
 		{
-//			GLState.pwmBackup[0]=(u16)(*thro_homing);
 			GLState.output[GL_THRO]=*thro_homing;
 		}
 	}
@@ -135,17 +122,13 @@ void updateGlideLock(void)
 		{
 			//printf("%d\r\n",pwmValues[CH_THRO]);
 			glstate=0;
-//			GLState.pwmBackup[0]=(u16)pwmValues[CH_THRO];
 			GLState.output[GL_THRO]=pwmNorm[CH_THRO];
 		}
 		else if(GLState.mode)
 		{
 			if(GLHallInt)
 			{
-				//printf("a%d\r\n",pwmValues[CH_THRO]);
-				//GLState.hallState[0]=0;
 				glstate=1;
-//				GLState.pwmBackup[0]=(u16)(*thro_homing);
 				GLState.output[GL_THRO]=*thro_homing;
 			}
 		}
@@ -160,68 +143,53 @@ void updateRollTest(void)
 {
 	if(rollstate==0)
 	{
-		//printf("rt0\r\n");
-		if(GLState.hallState[2])
-		{
-			//GLState.hallState[2]=0;
+		//unknow phase
+		//wait for next down stroke
+		GLState.output[GL_LAILE]=LAileZero;
+		GLState.output[GL_RAILE]=RAileZero;
+		if(GLState.phase==1)
 			rollstate=1;
-			GLState.counter=0;
-			rollpos1=*roll_delay*GLState.peroid[0];
-			rollpos2=*roll_span*GLState.peroid[0]+rollpos1;
-		}
-		else
-		{
-//			GLState.pwmBackup[1]=LAileZero;
-//			GLState.pwmBackup[2]=RAileZero;
-			GLState.output[GL_LAILE]=LAileZero;
-			GLState.output[GL_RAILE]=RAileZero;
-		}
 	}
 	if(rollstate==1)
 	{
-		//printf("rt1\r\n");
-		if(GLState.counter>=rollpos1)
-		{
+		//down stroke
+		//wait for entering up stroke
+		GLState.output[GL_LAILE]=LAileZero;
+		GLState.output[GL_RAILE]=RAileZero;
+		if(GLState.phase==0)
 			rollstate=2;
-		}
-		else
-		{
-//			GLState.pwmBackup[1]=LAileZero;
-//			GLState.pwmBackup[2]=RAileZero;
-			GLState.output[GL_LAILE]=LAileZero;
-			GLState.output[GL_RAILE]=RAileZero;
-		}
 	}
 	if(rollstate==2)
 	{
-		//printf("rt2\r\n");
-		if(GLState.counter>rollpos2)
-		{
+		//upstroke
+		//retract
+		GLState.output[GL_LAILE]=LAileZero-GLState.rollValue;
+		GLState.output[GL_RAILE]=RAileZero;
+		if(GLState.phase==1)
 			rollstate=3;
-		}
-		else
-		{
-//			GLState.pwmBackup[1]=(u16)(LAileZero-GLState.rollValue);
-//			GLState.pwmBackup[2]=RAileZero;
-			GLState.output[GL_LAILE]=LAileZero-GLState.rollValue;
-			GLState.output[GL_RAILE]=RAileZero;
-		}
 	}
 	if(rollstate==3)
-	{		
-//		GLState.pwmBackup[1]=LAileZero;
-//		GLState.pwmBackup[2]=RAileZero;
+	{
+		//downstroke
+		//retract
+		GLState.output[GL_LAILE]=LAileZero-GLState.rollValue;
+		GLState.output[GL_RAILE]=RAileZero;
+		if(GLState.phase==0)
+			rollstate=4;
+	}
+	if(rollstate==4)
+	{
+		//arbitrary
+		//stuck
 		GLState.output[GL_LAILE]=LAileZero;
 		GLState.output[GL_RAILE]=RAileZero;
+		
 	}
 }
 
 void GLUpdate(s8 glEnabled,s8 rollEnabled)
 {
 	//default:follow input
-//	GLState.pwmBackup[0]=(u16)pwmValues[0];
-//	GLState.pwmBackup[1]=(u16)pwmValues[1];
-//	GLState.pwmBackup[2]=(u16)pwmValues[2];
 
 	GLState.output[GL_THRO]=pwmNorm[CH_THRO];
 	if(glEnabled==ACTIVATED)
@@ -232,14 +200,9 @@ void GLUpdate(s8 glEnabled,s8 rollEnabled)
 			GLState.throVal=(u16)pwmValues[CH_THRO];
 		}
 		updateGlideLock();
-//		GLState.throVal+=*thro_slope;
-//		if(GLState.throVal>GLState.throTgt)
-//			GLState.throVal=GLState.throTgt;
-//		GLState.pwmBackup[0]=(u16)GLState.throVal;
 	}
 	else
 	{
-//		GLState.pwmBackup[0]=(u16)pwmValues[CH_THRO];
 		GLState.output[GL_THRO]=pwmNorm[CH_THRO];
 	}
 	GLState.GLEnabled=glEnabled;
@@ -254,11 +217,10 @@ void GLUpdate(s8 glEnabled,s8 rollEnabled)
 	}
 	else
 	{
-//		GLState.pwmBackup[1]=(u16)pwmValues[1];
-//		GLState.pwmBackup[2]=(u16)pwmValues[2];
 		GLState.output[GL_LAILE]=LAileZero;
 		GLState.output[GL_RAILE]=RAileZero;
 	}
+	GLState.rollEnabled=rollEnabled;
 	
 	if(GLState.phase<0)
 	{
@@ -285,19 +247,11 @@ void GLUpdate(s8 glEnabled,s8 rollEnabled)
 			GLState.phase=0;
 		}
 	}
-	
-//	if(GLState.phase==0)
-//	{
-//		GLState.pwmBackup[0]=1600;
-//	}
-	
-	GLState.rollEnabled=rollEnabled;
+		
 	GLState.hallState[0]=0;
 	GLState.hallState[1]=0;
 	GLState.hallState[2]=0;
-	GLState.hallState[3]=0;
-	
-	
+	GLState.hallState[3]=0;	
 }
 
 void EXTI15_10_IRQHandler(void)
